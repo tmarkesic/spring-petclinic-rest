@@ -1,8 +1,26 @@
+FROM openjdk:latest as build
+
+WORKDIR /build 
+
+COPY pom.xml mvnw ./
+
+COPY .mvn /build/.mvn
+
+RUN ./mvnw -B dependency:go-offline
+
+##COPY pom.xml mvnw
+
+##RUN --mount=type=cache,target=/./.mvn ./mvnw dependency:resolve
+
+COPY . .
+
+RUN ./mvnw clean install
+
 FROM openjdk:latest
 
 WORKDIR /app
 
-COPY target/spring-petclinic-rest-3.0.2.jar /app
+COPY --from=build /build/target/spring-petclinic-rest-3.0.2.jar /app
 
 EXPOSE 9966
 

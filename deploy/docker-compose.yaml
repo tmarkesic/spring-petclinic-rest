@@ -17,6 +17,8 @@ services:
     image: tmarkesic/petclinic-rest
     environment: 
       SPRING_DATASOURCE_URL: jdbc:postgresql://petclinic-db:5432/petclinic
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: petclinic
     ports:
       - "9966:9966"
     depends_on:
@@ -27,8 +29,10 @@ services:
 
   petclinic-fe:
     image: tmarkesic/petclinic-angular
+    environment: 
+      REST_API_URL: https://localhost:9966/petclinic/api
     ports:
-      - "4200:8080"
+      - "4200:80"
     depends_on:
       - petclinic-be
     networks:

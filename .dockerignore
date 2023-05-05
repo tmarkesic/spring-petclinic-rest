@@ -1,0 +1,9 @@
+# 
+.github
+.git
+LICENSE.txt
+Dockerfile
+deploy/
+petclinic-ermodel.png
+readme.md
+target/
