@@ -29,8 +29,6 @@ services:
 
   petclinic-fe:
     image: tmarkesic/petclinic-angular
-    environment: 
-      REST_API_URL: https://localhost:9966/petclinic/api
     ports:
       - "4200:80"
     depends_on:
