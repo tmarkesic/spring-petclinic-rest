@@ -8,10 +8,6 @@ COPY .mvn /build/.mvn
 
 RUN ./mvnw -B dependency:go-offline
 
-##COPY pom.xml mvnw
-
-##RUN --mount=type=cache,target=/./.mvn ./mvnw dependency:resolve
-
 COPY . .
 
 RUN ./mvnw clean install
