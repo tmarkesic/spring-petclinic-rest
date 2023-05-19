@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build Backend') {
+            steps {
+                 checkout([$class: 'GitSCM', branches: [[name: 'dockerfiles']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/tmarkesic/spring-petclinic-rest.git']]])
+                 sh 'docker build -t tmarkesic/petclinic-rest .'
+                 dir('./src/main/resources/db/postgresql') {
+                    sh 'docker build -t tmarkesic/petclinic-psql .'
+                 }
+            }
+        }
+        stage('Build Frontend') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: 'dockerfiles']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/tmarkesic/spring-petclinic-angular.git']]])
+                    sh 'docker build -t tmarkesic/petclinic-angular .'
+            }
+        }
+        stage('Push Docker Images to Docker Hub') {
+            steps {
+                // Push the backend Docker image to Docker Hub
+                sh 'docker push tmarkesic/petclinic-rest'
+                // Push the frontend Docker image to Docker Hub
+                sh 'docker push tmarkesic/petclinic-angular'
+                // Push the postgresql Docker image to Docker Hub
+                sh 'docker push tmarkesic/petclinic-psql'
+            }
+        }
+    }
+}
