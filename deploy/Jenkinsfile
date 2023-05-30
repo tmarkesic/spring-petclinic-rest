@@ -2,30 +2,21 @@ pipeline {
     agent any
 
     stages {
-        stage('Build Backend') {
+        stage('Build and push backend') {
             steps {
-                 checkout([$class: 'GitSCM', branches: [[name: 'dockerfiles']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/tmarkesic/spring-petclinic-rest.git']]])
+                 checkout([$class: 'GitSCM', branches: [[name: 'develop']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/tmarkesic/spring-petclinic-rest.git']]])
                  sh 'docker build -t tmarkesic/petclinic-rest .'
-                 dir('./src/main/resources/db/postgresql') {
-                    sh 'docker build -t tmarkesic/petclinic-psql .'
-                 }
+                 sh 'docker push tmarkesic/petclinic-rest'
+
             }
         }
-        stage('Build Frontend') {
+        stage('Build and push frontend') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: 'dockerfiles']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/tmarkesic/spring-petclinic-angular.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: 'develop']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/tmarkesic/spring-petclinic-angular.git']]])
                     sh 'docker build -t tmarkesic/petclinic-angular .'
+                    sh 'docker push tmarkesic/petclinic-angular'
             }
         }
-        stage('Push Docker Images to Docker Hub') {
-            steps {
-                // Push the backend Docker image to Docker Hub
-                sh 'docker push tmarkesic/petclinic-rest'
-                // Push the frontend Docker image to Docker Hub
-                sh 'docker push tmarkesic/petclinic-angular'
-                // Push the postgresql Docker image to Docker Hub
-                sh 'docker push tmarkesic/petclinic-psql'
-            }
-        }
+        
     }
 }
