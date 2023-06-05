@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build and push backend') {
+            steps {
+                 checkout([$class: 'GitSCM', branches: [[name: 'develop']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/tmarkesic/spring-petclinic-rest.git']]])
+                 sh 'docker build -t tmarkesic/petclinic-rest .'
+                 sh 'docker push tmarkesic/petclinic-rest'
+
+            }
+        }
+       stage ('Scan and Build Jar File') {
+            steps {
+                withSonarQubeEnv(installationName: 'SonarQube', credentialsId: 'SonarQube_Token') {
+                    sh './mvnw clean package sonar:sonar'
+                }
+            }
+        }
+        stage('Build and push frontend') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: 'develop']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/tmarkesic/spring-petclinic-angular.git']]])
+                    sh 'docker build -t tmarkesic/petclinic-angular .'
+                    sh 'docker push tmarkesic/petclinic-angular'
+            }
+        }
+        
+    }
+}
